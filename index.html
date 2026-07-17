@@ -2,105 +2,185 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dots and Boxes - For Avisha & Dharmik</title>
     <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fff5f5 0%, #f0f4ff 100%);
+            --color-avisha: #ff5e7e;
+            --color-dharmik: #4a90e2;
+            --shadow-avisha: 0 0 15px rgba(255, 94, 126, 0.6);
+            --shadow-dharmik: 0 0 15px rgba(74, 144, 226, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .game-container {
             text-align: center;
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            width: 100%;
+            max-width: 400px;
         }
 
         h1 {
-            color: #333;
-            margin-top: 0;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--color-avisha), var(--color-dharmik));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 5px 0;
         }
 
         .role-indicator {
-            font-size: 1rem;
-            color: #666;
-            margin-bottom: 10px;
-            font-weight: bold;
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .scoreboard {
             display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            font-weight: bold;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
         .player {
-            padding: 8px 16px;
-            border-radius: 8px;
+            flex: 1;
+            padding: 10px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid transparent;
             transition: all 0.3s ease;
         }
 
-        .avisha { color: #ff4d4d; border: 2px solid transparent; }
-        .dharmik { color: #3b82f6; border: 2px solid transparent; }
+        .avisha { color: var(--color-avisha); }
+        .dharmik { color: var(--color-dharmik); }
 
-        .avisha.active { border-color: #ff4d4d; background: #ffe6e6; }
-        .dharmik.active { border-color: #3b82f6; background: #e6f0ff; }
+        .avisha.active { 
+            border-color: var(--color-avisha); 
+            background: white;
+            box-shadow: var(--shadow-avisha);
+        }
+        .dharmik.active { 
+            border-color: var(--color-dharmik); 
+            background: white;
+            box-shadow: var(--shadow-dharmik);
+        }
+
+        .score-num {
+            display: block;
+            font-size: 1.5rem;
+            margin-top: 2px;
+        }
 
         .board-wrapper {
-            position: relative;
-            background: #fafafa;
-            border-radius: 8px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
             padding: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         canvas {
+            max-width: 100%;
+            height: auto;
             display: block;
+        }
+
+        #resetBtn {
+            margin-top: 15px;
+            padding: 12px 30px;
+            border-radius: 50px;
             cursor: pointer;
+            border: none;
+            background: #1a202c;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.2s;
         }
 
         /* Modals and Overlays */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.75);
+            background: rgba(10, 15, 30, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 2000;
+            padding: 20px;
         }
 
         .role-box {
             background: white;
-            padding: 40px;
-            border-radius: 16px;
+            padding: 30px 20px;
+            border-radius: 24px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .role-box h2 {
+            margin-top: 0;
+            color: #1a202c;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
         }
 
         .role-btn {
-            font-size: 1.2rem;
-            font-weight: bold;
-            padding: 12px 30px;
-            margin: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 14px 0;
+            width: 100%;
+            margin: 8px 0;
             border: none;
-            border-radius: 8px;
+            border-radius: 14px;
             cursor: pointer;
             color: white;
-            transition: transform 0.2s;
         }
 
-        .role-btn:hover { transform: scale(1.05); }
-        .btn-avisha { background: #ff4d4d; }
-        .btn-dharmik { background: #3b82f6; }
+        .btn-avisha { background: linear-gradient(135deg, #ff7b93, var(--color-avisha)); }
+        .btn-dharmik { background: linear-gradient(135deg, #6ba4e8, var(--color-dharmik)); }
 
         .modal {
             display: none;
@@ -108,59 +188,59 @@
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1000;
-            animation: fadeInOut 1.5s ease-in-out forwards;
+            width: 80%;
+            max-width: 300px;
+            animation: fadeInOut 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
         }
 
         .modal-content {
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(26, 32, 44, 0.95);
             color: white;
-            padding: 15px 40px;
+            padding: 15px 20px;
             border-radius: 50px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            border: 2px solid transparent;
         }
 
         @keyframes fadeInOut {
-            0% { opacity: 0; transform: translate(-50%, -40%); }
-            15% { opacity: 1; transform: translate(-50%, -50%); }
-            85% { opacity: 1; transform: translate(-50%, -50%); }
-            100% { opacity: 0; transform: translate(-50%, -60%); }
+            0% { opacity: 0; transform: translate(-50%, -30%) scale(0.9); }
+            15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -70%) scale(0.9); }
         }
     </style>
 </head>
 <body>
 
-    <!-- Role Selection Interface -->
     <div id="roleOverlay" class="overlay">
         <div class="role-box">
-            <h2>Choose Who Is Playing:</h2>
+            <h2>Select Your Profile</h2>
             <button class="role-btn btn-avisha" onclick="selectRole('Avisha')">Avisha</button>
             <button class="role-btn btn-dharmik" onclick="selectRole('Dharmik')">Dharmik</button>
         </div>
     </div>
 
     <div class="game-container">
-        <h1>Dots & Boxes Online</h1>
-        <div id="identityDisplay" class="role-indicator">Playing As: Guest</div>
+        <h1>Dots & Boxes</h1>
+        <div id="identityDisplay" class="role-indicator">Connecting...</div>
         
         <div class="scoreboard">
-            <div class="player avisha">Avisha (Red): <span id="score-avisha">0</span></div>
-            <div class="player dharmik">Dharmik (Blue): <span id="score-dharmik">0</span></div>
+            <div class="player avisha">Avisha <span id="score-avisha" class="score-num">0</span></div>
+            <div class="player dharmik">Dharmik <span id="score-dharmik" class="score-num">0</span></div>
         </div>
 
         <div class="board-wrapper">
-            <canvas id="gameBoard" width="400" height="400"></canvas>
+            <canvas id="gameBoard" width="360" height="360"></canvas>
         </div>
-        <button id="resetBtn" style="margin-top: 15px; padding: 8px 16px; border-radius: 5px; cursor: pointer; border: 1px solid #ccc; background: #fff; font-weight: bold;">Reset Game</button>
+        <button id="resetBtn">Reset Arena</button>
     </div>
 
-    <!-- Turn Popup Message -->
     <div id="turnModal" class="modal">
         <div class="modal-content" id="modalText"></div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     
@@ -186,15 +266,15 @@
         const modalText = document.getElementById("modalText");
 
         const GRID_SIZE = 5;
-        const CELL_SIZE = 80;
+        const CELL_SIZE = 70;
         const OFFSET = 40;
         const LINE_THICKNESS = 6;
-        const DOT_RADIUS = 6;
+        const DOT_RADIUS = 5;
 
-        const AVISHA = { name: "Avisha", color: "#ff4d4d" };
-        const DHARMIK = { name: "Dharmik", color: "#3b82f6" };
+        const COLOR_AVISHA = "#ff5e7e";
+        const COLOR_DHARMIK = "#4a90e2";
 
-        let myRole = null; // Local identity tracking
+        let myRole = null; 
         let gameState = {
             currentPlayerName: "Avisha",
             scores: { Avisha: 0, Dharmik: 0 },
@@ -207,7 +287,7 @@
             myRole = role;
             document.getElementById("roleOverlay").style.display = "none";
             document.getElementById("identityDisplay").innerText = `Playing As: ${role}`;
-            document.getElementById("identityDisplay").style.color = role === "Avisha" ? AVISHA.color : DHARMIK.color;
+            document.getElementById("identityDisplay").style.color = role === "Avisha" ? COLOR_AVISHA : COLOR_DHARMIK;
         }
 
         function generateInitialState() {
@@ -258,8 +338,10 @@
 
         function showTurnPopup() {
             isTurnLocked = true; 
-            modalText.innerText = `${gameState.currentPlayerName}'s Turn!`;
-            modalText.style.borderColor = gameState.currentPlayerName === "Avisha" ? AVISHA.color : DHARMIK.color;
+            const isAvisha = gameState.currentPlayerName === "Avisha";
+            
+            modalText.innerText = isAvisha ? "Avisha's Turn" : "Dharmik's Turn";
+            modalText.style.borderColor = isAvisha ? COLOR_AVISHA : COLOR_DHARMIK;
             modal.style.display = "block";
 
             modal.style.animation = 'none';
@@ -282,12 +364,11 @@
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             if (!gameState.boxes || !gameState.lines) return;
 
             gameState.boxes.forEach(box => {
                 if (box.owner) {
-                    ctx.fillStyle = box.owner === "Avisha" ? "rgba(255, 77, 77, 0.15)" : "rgba(59, 130, 246, 0.15)";
+                    ctx.fillStyle = box.owner === "Avisha" ? "rgba(255, 94, 126, 0.08)" : "rgba(74, 144, 226, 0.08)";
                     ctx.fillRect(OFFSET + box.c * CELL_SIZE, OFFSET + box.r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
                 }
             });
@@ -296,7 +377,7 @@
                 ctx.beginPath();
                 ctx.lineWidth = LINE_THICKNESS;
                 ctx.lineCap = "round";
-                ctx.strokeStyle = line.owner ? (line.owner === "Avisha" ? AVISHA.color : DHARMIK.color) : "#e0e0e0";
+                ctx.strokeStyle = line.owner ? (line.owner === "Avisha" ? COLOR_AVISHA : COLOR_DHARMIK) : "#f1f5f9";
                 ctx.moveTo(OFFSET + line.x1 * CELL_SIZE, OFFSET + line.y1 * CELL_SIZE);
                 ctx.lineTo(OFFSET + line.x2 * CELL_SIZE, OFFSET + line.y2 * CELL_SIZE);
                 ctx.stroke();
@@ -306,27 +387,26 @@
                 for (let c = 0; c < GRID_SIZE; c++) {
                     ctx.beginPath();
                     ctx.arc(OFFSET + c * CELL_SIZE, OFFSET + r * CELL_SIZE, DOT_RADIUS, 0, 2 * Math.PI);
-                    ctx.fillStyle = "#444";
+                    ctx.fillStyle = "#cbd5e1";
                     ctx.fill();
                 }
             }
         }
 
-        canvas.addEventListener("click", (e) => {
+        function handleInteraction(clientX, clientY) {
             if (isTurnLocked) return; 
-            
-            // STRICT TURN LOCK: Only allow input if the active game turn matches your selected profile role
-            if (myRole !== gameState.currentPlayerName) {
-                alert(`It's not your turn! Wait for ${gameState.currentPlayerName}.`);
-                return;
-            }
+            if (myRole !== gameState.currentPlayerName) return;
 
             const rect = canvas.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
+            // Calculate scale factor in case mobile CSS resized the canvas visually
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            const clickX = (clientX - rect.left) * scaleX;
+            const clickY = (clientY - rect.top) * scaleY;
 
             let closestLine = null;
-            let minDist = 15; 
+            let minDist = 24; // Increased distance threshold to make tapping easier on phones
 
             gameState.lines.forEach(line => {
                 if (line.owner) return;
@@ -351,21 +431,27 @@
                 closestLine.owner = gameState.currentPlayerName;
                 let boxScored = checkBoxes();
 
-                if (boxScored) {
-                    if (gameState.boxes.every(b => b.owner !== null)) {
-                        setTimeout(() => alert("Game Over! Check final scores on screen."), 300);
-                    }
-                } else {
+                if (!boxScored) {
                     gameState.currentPlayerName = gameState.currentPlayerName === "Avisha" ? "Dharmik" : "Avisha";
                 }
-                
                 gameRef.set(gameState);
             }
+        }
+
+        // Desktop Mouse Click Handling
+        canvas.addEventListener("click", (e) => {
+            handleInteraction(e.clientX, e.clientY);
         });
+
+        // Mobile Touch Tap Handling
+        canvas.addEventListener("touchstart", (e) => {
+            e.preventDefault(); // Prevents double click zooming on mobile browsers
+            const touch = e.touches[0];
+            handleInteraction(touch.clientX, touch.clientY);
+        }, { passive: false });
 
         function checkBoxes() {
             let closedAnyBox = false;
-
             gameState.boxes.forEach(box => {
                 if (box.owner) return;
 
@@ -380,7 +466,6 @@
                     closedAnyBox = true;
                 }
             });
-
             return closedAnyBox;
         }
 
