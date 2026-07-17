@@ -366,9 +366,10 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (!gameState.boxes || !gameState.lines) return;
 
+            // Box fills mapped to a darker, clearer opacity (0.35)
             gameState.boxes.forEach(box => {
                 if (box.owner) {
-                    ctx.fillStyle = box.owner === "Avisha" ? "rgba(255, 94, 126, 0.08)" : "rgba(74, 144, 226, 0.08)";
+                    ctx.fillStyle = box.owner === "Avisha" ? "rgba(255, 94, 126, 0.35)" : "rgba(74, 144, 226, 0.35)";
                     ctx.fillRect(OFFSET + box.c * CELL_SIZE, OFFSET + box.r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
                 }
             });
@@ -398,7 +399,6 @@
             if (myRole !== gameState.currentPlayerName) return;
 
             const rect = canvas.getBoundingClientRect();
-            // Calculate scale factor in case mobile CSS resized the canvas visually
             const scaleX = canvas.width / rect.width;
             const scaleY = canvas.height / rect.height;
 
@@ -406,7 +406,7 @@
             const clickY = (clientY - rect.top) * scaleY;
 
             let closestLine = null;
-            let minDist = 24; // Increased distance threshold to make tapping easier on phones
+            let minDist = 24; 
 
             gameState.lines.forEach(line => {
                 if (line.owner) return;
@@ -438,14 +438,12 @@
             }
         }
 
-        // Desktop Mouse Click Handling
         canvas.addEventListener("click", (e) => {
             handleInteraction(e.clientX, e.clientY);
         });
 
-        // Mobile Touch Tap Handling
         canvas.addEventListener("touchstart", (e) => {
-            e.preventDefault(); // Prevents double click zooming on mobile browsers
+            e.preventDefault(); 
             const touch = e.touches[0];
             handleInteraction(touch.clientX, touch.clientY);
         }, { passive: false });
