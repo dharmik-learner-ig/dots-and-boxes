@@ -28,6 +28,13 @@
             margin-top: 0;
         }
 
+        .role-indicator {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
         .scoreboard {
             display: flex;
             justify-content: space-around;
@@ -60,12 +67,45 @@
             cursor: pointer;
         }
 
-        /* Turn Popup Styling */
+        /* Modals and Overlays */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .role-box {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .role-btn {
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 12px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.2s;
+        }
+
+        .role-btn:hover { transform: scale(1.05); }
+        .btn-avisha { background: #ff4d4d; }
+        .btn-dharmik { background: #3b82f6; }
+
         .modal {
             display: none;
             position: fixed;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1000;
             animation: fadeInOut 1.5s ease-in-out forwards;
@@ -90,8 +130,19 @@
     </style>
 </head>
 <body>
+
+    <!-- Role Selection Interface -->
+    <div id="roleOverlay" class="overlay">
+        <div class="role-box">
+            <h2>Choose Who Is Playing:</h2>
+            <button class="role-btn btn-avisha" onclick="selectRole('Avisha')">Avisha</button>
+            <button class="role-btn btn-dharmik" onclick="selectRole('Dharmik')">Dharmik</button>
+        </div>
+    </div>
+
     <div class="game-container">
         <h1>Dots & Boxes Online</h1>
+        <div id="identityDisplay" class="role-indicator">Playing As: Guest</div>
         
         <div class="scoreboard">
             <div class="player avisha">Avisha (Red): <span id="score-avisha">0</span></div>
@@ -109,11 +160,10 @@
         <div class="modal-content" id="modalText"></div>
     </div>
 
-    <!-- Firebase Core and Realtime Database SDKs via CDN -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     
-    <!-- Game Engine Configuration and Logic -->
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyBLx63V0jvG6-4bEJuiJMnctjNFc6Mpdk",
@@ -126,7 +176,6 @@
           measurementId: "G-R0C55Z9YT5"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const gameRef = database.ref("shared_game_state");
@@ -145,6 +194,7 @@
         const AVISHA = { name: "Avisha", color: "#ff4d4d" };
         const DHARMIK = { name: "Dharmik", color: "#3b82f6" };
 
+        let myRole = null; // Local identity tracking
         let gameState = {
             currentPlayerName: "Avisha",
             scores: { Avisha: 0, Dharmik: 0 },
@@ -152,6 +202,13 @@
             boxes: []
         };
         let isTurnLocked = false; 
+
+        function selectRole(role) {
+            myRole = role;
+            document.getElementById("roleOverlay").style.display = "none";
+            document.getElementById("identityDisplay").innerText = `Playing As: ${role}`;
+            document.getElementById("identityDisplay").style.color = role === "Avisha" ? AVISHA.color : DHARMIK.color;
+        }
 
         function generateInitialState() {
             let localLines = [];
@@ -180,7 +237,6 @@
             };
         }
 
-        // Sync database structure across players
         gameRef.on("value", (snapshot) => {
             const data = snapshot.val();
             if (!data) {
@@ -258,6 +314,12 @@
 
         canvas.addEventListener("click", (e) => {
             if (isTurnLocked) return; 
+            
+            // STRICT TURN LOCK: Only allow input if the active game turn matches your selected profile role
+            if (myRole !== gameState.currentPlayerName) {
+                alert(`It's not your turn! Wait for ${gameState.currentPlayerName}.`);
+                return;
+            }
 
             const rect = canvas.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
