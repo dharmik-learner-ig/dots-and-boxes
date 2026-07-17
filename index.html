@@ -274,6 +274,12 @@
         const COLOR_AVISHA = "#ff5e7e";
         const COLOR_DHARMIK = "#4a90e2";
 
+        // Preloading the avatar images
+        const imgAvisha = new Image();
+        imgAvisha.src = 'avisha.png';
+        const imgDharmik = new Image();
+        imgDharmik.src = 'dharmik.png';
+
         let myRole = null; 
         let gameState = {
             currentPlayerName: "Avisha",
@@ -329,12 +335,18 @@
             gameState = data;
             
             updateUI();
-            draw();
 
             if (turnSwitched) {
                 showTurnPopup();
             }
         });
+
+        // Loop animation system to handle smooth shaking of images
+        function animationLoop() {
+            draw();
+            requestAnimationFrame(animationLoop);
+        }
+        requestAnimationFrame(animationLoop);
 
         function showTurnPopup() {
             isTurnLocked = true; 
@@ -366,11 +378,29 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (!gameState.boxes || !gameState.lines) return;
 
-            // Box fills mapped to a darker, clearer opacity (0.35)
+            const time = Date.now() * 0.03; // Controls how fast the funny shake is
+
             gameState.boxes.forEach(box => {
                 if (box.owner) {
+                    // Base colored tile background
                     ctx.fillStyle = box.owner === "Avisha" ? "rgba(255, 94, 126, 0.35)" : "rgba(74, 144, 226, 0.35)";
                     ctx.fillRect(OFFSET + box.c * CELL_SIZE, OFFSET + box.r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+
+                    // Add funny wiggling calculation for the profile photo
+                    let shakeX = Math.sin(time + (box.r * 5) + box.c) * 2.5;
+                    let shakeY = Math.cos(time + (box.c * 5) + box.r) * 2.5;
+
+                    let img = box.owner === "Avisha" ? imgAvisha : imgDharmik;
+                    
+                    // Draw image inside the block with standard padding
+                    let padding = 8;
+                    let x = OFFSET + box.c * CELL_SIZE + padding + shakeX;
+                    let y = OFFSET + box.r * CELL_SIZE + padding + shakeY;
+                    let size = CELL_SIZE - (padding * 2);
+
+                    if (img.complete && img.naturalWidth !== 0) {
+                        ctx.drawImage(img, x, y, size, size);
+                    }
                 }
             });
 
